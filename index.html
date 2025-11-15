@@ -7,23 +7,34 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <div class="menu">
-      <button id="menuBtn">☰</button>
-      <div id="menuList" class="menu-list">
-        <button onclick="selectAuthor('statham')">Джейсон Стетхэм</button>
-        <button onclick="selectAuthor('ronaldo')">Криштиану Роналду</button>
-        <button onclick="selectAuthor('David')">Дэвид Гоггинс</button>
-        <button onclick="selectAuthor('Jack')">Джек Ма</button>
-      </div>
-    </div>
 
-    <div class="quote-box">
-      <p id="quoteText">Выберите автора</p>
-      <button id="nextBtn" onclick="nextQuote()">Next Quote</button>
+  <div class="menu">
+    <button id="menuBtn">☰</button>
+    <div id="menuList" class="menu-list">
+      <button onclick="selectAuthor('statham')">Джейсон Стетхэм</button>
+      <button onclick="selectAuthor('ronaldo')">Криштиану Роналду</button>
+      <button onclick="selectAuthor('David')">Дэвид Гоггинс</button>
+      <button onclick="selectAuthor('Jack')">Джек Ма</button>
     </div>
   </div>
 
+  <div class="container">
+    <div class="quote-box">
+      <p id="quoteText" class="fade">Выберите автора</p>
+
+      <div class="btns">
+        <button id="nextBtn" onclick="nextQuote()">Next Quote</button>
+        <button id="saveBtn" onclick="saveAsImage()">Save</button>
+      </div>
+    </div>
+
+    <div class="history">
+      <h3>История</h3>
+      <ul id="historyList"></ul>
+    </div>
+  </div>
+
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

@@ -1,42 +1,23 @@
-const quotes = {
-  statham: [
-  "Многие считают, что лучшая пара,это когда парень выше девушки, но лучшая пара та-которую отменили.",
-  "Если жизнь - это вызов, то я перезвоню.",
-  "Я так много читал о вреде алкоголя, что решил бросить читать."
-  ],
-  ronaldo: [
-    "Ваша любовь делает меня сильным, ваша ненависть делает меня неудержимым.",
-    "Иногда для большого прыжка нужно сделать шаг назад.",
-    "В жизни всё нелегко. Если бы было наоборот, мы не рождались бы плача.",
+let currentAuthor = null;
 
-  ],
-  David: [
-    "Не останавливайся, когда устал. Остановись, когда закончишь",
-    "Вы можете проиграть утреннюю битву, но не проиграть дневную войну!",
-    "Если ты думаешь, что ты достиг вершины, помни, твой потолок чей-то пол. Именно таким ты хотел стать?",
-    "Иногда нужно вступить в войну с самим собой, чтобы исправить себя.",
-    "Суть в том,  что жизнь - это одна большая игра разума.  Единственный человек,  против которого вы играете,  - это вы сами"
-  ],
-   Jack: [
-    "Сегодня будет непросто, завтра будет еще хуже, но послезавтра все будет прекрасно.",
-    "Миру наплевать на то, что вы скажете, важно то, что вы сделаете.",
-    "Ищите правильных людей, а не лучших людей.",
-    "Забудьте о конкурентах и сфокусируйтесь на клиентах.",
-    "Если вы относитесь ко всем вокруг как к врагам, то они и будут вашими врагами."
-  ]
+const authorAPI = {
+  statham: "Jason Statham",
+  ronaldo: "Cristiano Ronaldo",
+  David: "David Goggins",
+  Jack: "Jack Ma"
 };
 
 const backgrounds = {
   statham: "url('images/statham.jpg')",
-  jobs: "url('images/ronaldo.jpg')",
-  twain: "url('images/David.jpg')"
+  ronaldo: "url('images/ronaldo.jpg')",
+  David: "url('images/David.jpg')",
+  Jack: "url('images/jack.jpg')"
 };
 
-let currentAuthor = null;
-
+const quoteText = document.getElementById("quoteText");
+const historyList = document.getElementById("historyList");
 const menuBtn = document.getElementById("menuBtn");
 const menuList = document.getElementById("menuList");
-const quoteText = document.getElementById("quoteText");
 
 menuBtn.addEventListener("click", () => {
   menuList.style.display = menuList.style.display === "flex" ? "none" : "flex";
@@ -49,12 +30,57 @@ function selectAuthor(author) {
   menuList.style.display = "none";
 }
 
-function nextQuote() {
+async function fetchFromQuotable(authorName) {
+  const res = await fetch(`https://api.quotable.io/random?author=${authorName}`);
+  const data = await res.json();
+  return data.content || null;
+}
+
+async function fetchFromZen() {
+  const res = await fetch("https://zenquotes.io/api/random");
+  const data = await res.json();
+  return data[0].q;
+}
+
+async function nextQuote() {
   if (!currentAuthor) {
     quoteText.textContent = "Сначала выберите автора 🙂";
     return;
   }
-  const authorQuotes = quotes[currentAuthor];
-  const randomIndex = Math.floor(Math.random() * authorQuotes.length);
-  quoteText.textContent = authorQuotes[randomIndex];
+
+  quoteText.classList.remove("show");
+
+  let quote = null;
+
+  try {
+    // 70% шанс — авторская цитата через Quotable
+    if (Math.random() < 0.7) {
+      quote = await fetchFromQuotable(authorAPI[currentAuthor]);
+    }
+
+    // если API автора не дал цитату → взять ZenQuotes
+    if (!quote) quote = await fetchFromZen();
+  } catch {
+    quote = "Ошибка получения цитаты 😢";
+  }
+
+  quoteText.textContent = quote;
+  setTimeout(() => quoteText.classList.add("show"), 50);
+
+  addToHistory(quote);
+}
+
+function addToHistory(quote) {
+  const li = document.createElement("li");
+  li.textContent = quote;
+  historyList.prepend(li);
+}
+
+function saveAsImage() {
+  html2canvas(document.querySelector(".quote-box")).then(canvas => {
+    const link = document.createElement("a");
+    link.download = "quote.png";
+    link.href = canvas.toDataURL();
+    link.click();
+  });
 }
